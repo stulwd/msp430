@@ -44,6 +44,22 @@ int button = PUSH2;  //P1_3
 int a_in = A5;    //adc P1_5
 int pwm_out = GREEN_LED;
 
+void red(/* btn interrupt */) {
+  /* code */
+  static uint8_t state=0;
+
+  if(state)
+  {
+    digitalWrite(RED_LED, state);
+    state = 0;
+  }
+  else
+  {
+    digitalWrite(RED_LED, state);
+    state = 1;
+  }
+}
+
 // setup initializes serial and the button pin
 void setup()
 {
@@ -52,7 +68,8 @@ void setup()
   pinMode(RED_LED, OUTPUT);           //red output
   pinMode(GREEN_LED, OUTPUT);         //gled output.
   pinMode(button, INPUT_PULLUP);      //button input.
-  pinMode(a_in, INPUT_PULLUP);
+  pinMode(a_in, INPUT_PULLUP);        //ADC
+  attachInterrupt(button, red, FALLING);    //interrupt configure
 }
 
 // loop checks the button pin each time,
@@ -62,7 +79,7 @@ void loop()
   /*****blink*****/
   // if(digitalRead(RED_LED))  {digitalWrite(RED_LED, LOW);}
   // else {digitalWrite(RED_LED,HIGH);}
-digitalWrite(RED_LED, LOW);
+  //digitalWrite(RED_LED, LOW);
   /****test******/
   if (digitalRead(test) == HIGH)
   {
@@ -74,11 +91,11 @@ digitalWrite(RED_LED, LOW);
   }
 
   /******button********/
-  Serial.println("just a test!\n");
-  if (0 == digitalRead(button))         //low-level when button pressed.
-  {
-    Serial.println("button is pushed.\n" );
-  }
+  // Serial.println("just a test!\n");
+  // if (0 == digitalRead(button))         //low-level when button pressed.
+  // {
+  //   Serial.println("button is pushed.\n" );
+  // }
 
   /*********ADC*********/
   Serial.print("adc intput value =");
@@ -91,12 +108,14 @@ digitalWrite(RED_LED, LOW);
   for(int fadeValue = 0 ; fadeValue <= 255; fadeValue +=5) {
   // 输出PWM
   analogWrite(pwm_out, fadeValue);
+
   // 等待30ms，以便观察到渐变效果
   delay(15);
   }
   for(int fadeValue = 255 ; fadeValue >= 5; fadeValue -=5) {
   // 输出PWM
   analogWrite(pwm_out, fadeValue);
+
   delay(15);
   }
 
